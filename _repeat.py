@@ -25,7 +25,7 @@ import gaze_ocr
 import head_scroll
 import screen_ocr
 import win32clipboard
-import yappi
+#import yappi
 from gaze_ocr import eye_tracking
 from odictliteral import odict
 from six import string_types
@@ -465,7 +465,7 @@ full_key_action_map = utils.combine_maps(
         "home": Key("home"),
         "end": Key("end"),
         "tab": Key("tab"),
-        "delete": Key("del"),
+        #"delete": Key("del"),
     })
 
 # Actions that can be repeated by prefixing with a number modifier.
@@ -1612,13 +1612,13 @@ emacs_element_map = {
     "template": DictListRef(None, template_dict_list),
 }
 
-emacs_environment = MyEnvironment(name="Emacs",
-                                  parent=global_environment,
-                                  context=linux.UniversalAppContext(title = "Emacs editor"),
-                                  action_map=emacs_action_map,
-                                  repeatable_action_map=emacs_repeatable_action_map,
-                                  terminal_action_map=emacs_terminal_action_map,
-                                  element_map=emacs_element_map)
+#emacs_environment = MyEnvironment(name="Emacs",
+#                                  parent=global_environment,
+#                                  context=linux.UniversalAppContext(title = "Emacs editor"),
+#                                  action_map=emacs_action_map,
+#                                  repeatable_action_map=emacs_repeatable_action_map,
+#                                  terminal_action_map=emacs_terminal_action_map,
+#                                  element_map=emacs_element_map)
 
 
 ### Emacs: Python
@@ -1627,10 +1627,10 @@ emacs_python_action_map = odict[
     "[python] indent": Key("c-c, rangle"),
     "[python] dedent": Key("c-c, langle"),
 ]
-emacs_python_environment = MyEnvironment(name="EmacsPython",
-                                         parent=emacs_environment,
-                                         context=linux.UniversalAppContext(title="- Python -"),
-                                         action_map=emacs_python_action_map)
+#emacs_python_environment = MyEnvironment(name="EmacsPython",
+#                                         parent=emacs_environment,
+#                                         context=linux.UniversalAppContext(title="- Python -"),
+#                                         action_map=emacs_python_action_map)
 
 
 ### Emacs: Org-Mode
@@ -1689,12 +1689,12 @@ tag_dict_list = DictList("tag_dict_list", tags)
 emacs_org_element_map = {
     "tag": DictListRef(None, tag_dict_list),
 }
-emacs_org_environment = MyEnvironment(name="EmacsOrg",
-                                      parent=emacs_environment,
-                                      context=linux.UniversalAppContext(title="- Org -"),
-                                      action_map=emacs_org_action_map,
-                                      repeatable_action_map=emacs_org_repeatable_action_map,
-                                      element_map=emacs_org_element_map)
+#emacs_org_environment = MyEnvironment(name="EmacsOrg",
+#                                      parent=emacs_environment,
+#                                      context=linux.UniversalAppContext(title="- Org -"),
+#                                      action_map=emacs_org_action_map,
+#                                      repeatable_action_map=emacs_org_repeatable_action_map,
+#                                      element_map=emacs_org_element_map)
 
 
 ### Emacs: Shell
@@ -1707,10 +1707,142 @@ emacs_shell_action_map = utils.combine_maps(
         "shell (preev|back)": Key("a-r"),
         "show output": Key("c-c, c-r"),
     ])
-emacs_shell_environment = MyEnvironment(name="EmacsShell",
-                                        parent=emacs_environment,
-                                        context=linux.UniversalAppContext(title="- Shell -"),
-                                        action_map=emacs_shell_action_map)
+#emacs_shell_environment = MyEnvironment(name="EmacsShell",
+#                                        parent=emacs_environment,
+#                                        context=linux.UniversalAppContext(title="- Shell -"),
+#                                        action_map=emacs_shell_action_map)
+
+
+### Vim
+def vexec(cmd):
+    print("^O %s" % cmd)
+    return Key("c-o/3") + Text(cmd)
+
+
+def vexec2(cmd):
+    if local.PROPER_VIM:
+        return Key("c-backslash, c-o/3") + Text(cmd)
+    else:
+        return vexec(cmd)
+
+
+vim_movement = {
+    "up": "k",
+    "down": "j",
+    "left": "h",
+    "right": "l",
+    "next": "w",
+    "back": "b",
+}
+
+vim_contexts = {
+    "in quotes": "i\"",
+    "in parens": "i(",
+    "in braces": "i{",
+    "in word": "iw",
+    "in angles": "i<",
+    "in brackets": "i[",
+}
+
+vim_action_map = {
+    "next [<n1>]": vexec("%(n1)sw"),
+    "back [<n1>]": vexec("%(n1)sb"),
+    "up [<n1>]": Key("up:%(n1)s"),
+    "down [<n1>]": Key("down:%(n1)s"),
+    "right [<n1>]": Key("right:%(n1)s"),
+    "left [<n1>]": Key("left:%(n1)s"),
+    "fomble <character>": vexec("f%(char)s"),
+    "bamble <character>": vexec("F%(char)s"),
+    "ding": vexec(";"),
+    "line <line>": vexec("%(line)sG"),
+    "Position <line>": vexec("%(line)s|"),
+    "line end": vexec("A"),
+    "line start": vexec("I"),
+    "last line": vexec("G"),
+    "slap above": vexec("O"),
+    "slap below": vexec("o"),
+    "undo [<n>]": vexec("%(n)su") + vexec("h") + vexec("l"),
+    "redo": vexec(":redo") + Key("enter/25"),
+    "insert": Text("i"),
+    "sort [<n1>] <mvmt>": vexec("V%(n1)s%(mvmt)s:sort") + Key("enter"),
+    "sort <line> line": vexec("V%(line)sG:sort") + Key("enter"),
+    "cut rest": vexec("D") + vexec("A"),
+    "cut [<n1>] <mvmt>": vexec2("d%(n1)s%(mvmt)s"),
+    "cut <ctx>": vexec("d%(ctx)s"),
+    "cut fomble <character>": vexec("df%(char)s"),
+    "cut bamble <character>": vexec("dF%(char)s"),
+    "cut line": vexec("dd"),
+    utils.Override("delete"): vexec("x"),
+    "yank [<n1>] <mvmt>": vexec("y%(n1)s%(mvmt)s"),
+    "yank <ctx>": vexec("y%(ctx)s"),
+    "yank fomble <character>": vexec("yf%(char)s"),
+    "yank bamble <character>": vexec("yF%(char)s"),
+    "yank line": vexec("yy"),
+    "yank rest": vexec("y$"),
+    utils.Override("paste"): vexec("p"),
+    "paste (before|above)": vexec("P"),
+    "join lines": vexec("J"),
+    "again": vexec("."),
+    "save file": vexec(":w") + Key("enter"),
+    "Scroll center": vexec("zz"),
+    "Scroll Top": vexec("zt"),
+    "Scroll Bottom": vexec("zb"),
+    "Mark Set": vexec("ma"),
+    "Mark jump": vexec("'a"),
+    "Matching": vexec("%%"),
+    "toggle case": vexec("~"),
+
+    "search": vexec("/"),
+    "next search": vexec("n"),
+    "previous search": vexec("N"),
+
+    "Record macro": Key("escape, q, q, i"),
+    "macro done": vexec("q"),
+    "run macro": Key("escape, at, q"),
+
+    "comment": vexec("I") + Text("// "),
+    "uncomment": vexec("I") + vexec("d3l"),
+    "To do": Text("// TODO(clemens): "),
+
+    "save buffer": vexec(":w") + Key("enter"),
+    "save all buffers": vexec(":wa") + Key("enter"),
+    "previous buffer": Key("c-o, c-caret"),
+    "close buffer": vexec(":bd") + Key("enter"),
+    "save and quit": vexec(":x") + Key("enter"),
+
+    # Buffergator
+    "list buffers": Key("escape") + Text("\\b"),
+
+    # CtrlP
+    "control P": Key("escape") + Text(":CtrlP ~/src/server/go/src/dropbox") + Key("enter"),
+    "control rust": Key("escape") + Text(":CtrlP ~/src/server/rust") + Key("enter"),
+    "control Python": Key("escape") + Text(":CtrlP ~/src/server/dropbox") + Key("enter"),
+    "control DB ops": Key("escape") + Text(":CtrlP ~/src/server/dbops") + Key("enter"),
+    "control configs": Key("escape") + Text(":CtrlP ~/src/server/configs") + Key("enter"),
+    "recent files": Key("escape") + Text(":CtrlPMRU") + Key("enter"),
+    "control P clear cache": vexec(":CtrlPClearCache") + Key("enter"),
+
+    "open": Key("escape, i"),
+}
+
+movement_dict_list = DictList("movement_dict_list", vim_movement)
+vim_contexts_dict_list = DictList("vim_contexts_dict_list", vim_contexts)
+vim_element_map = {
+    "n1": (IntegerRef(None, 0, 100), 1),
+    "n2": IntegerRef(None, 0, 100),
+    "line": IntegerRef(None, 1, 10000),
+    "mvmt": DictListRef(None, movement_dict_list),
+    "ctx": DictListRef(None, vim_contexts_dict_list),
+    "character": DictListRef(None, DictList("chars_map", chars_map)),
+}
+
+
+vim_environment = MyEnvironment(name="Vim",
+                                parent=global_environment,
+                                context=AppContext(title=" - Visual Studio Code"),
+                                action_map=vim_action_map,
+                                element_map=vim_element_map)
+
 
 
 ### Shell
