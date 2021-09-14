@@ -545,10 +545,10 @@ command_action_map = utils.combine_maps(
     nonrepeatable_dictation_action_map,
     odict[
         # Semantic names for common keypresses.
-        "delete": Key("del"),
+        #"delete": Key("del"),
         "paste": Key("c-v"),
         "copy": Key("c-c"),
-        "cut": Key("c-x"),
+        #"cut": Key("c-x"),
         "all select": Key("c-a"),
         "go home|[go] west": Key("home"),
         "go end|[go] east": Key("end"),
@@ -1459,7 +1459,7 @@ emacs_action_map = odict[
     "replace": Key("as-5"),
     "regex replace": Key("cas-5"),
     "symbol replace": Key("a-apostrophe"),
-    utils.Override("cut"): Key("c-w"),
+    #utils.Override("cut"): Key("c-w"),
     utils.Override("copy"): Key("a-w"),
     utils.Override("paste"): Key("c-y"),
     "paste (other|preev)": Key("a-y"),
@@ -1718,7 +1718,6 @@ def vexec(cmd):
     print("^O %s" % cmd)
     return Key("c-o/3") + Text(cmd)
 
-
 def vexec2(cmd):
     if local.PROPER_VIM:
         return Key("c-backslash, c-o/3") + Text(cmd)
@@ -1751,8 +1750,8 @@ vim_action_map = {
     "down [<n1>]": Key("down:%(n1)s"),
     "right [<n1>]": Key("right:%(n1)s"),
     "left [<n1>]": Key("left:%(n1)s"),
-    "fomble <character>": vexec("f%(char)s"),
-    "bamble <character>": vexec("F%(char)s"),
+    "fomble <character>": vexec("f%(character)s"),
+    "bamble <character>": vexec("F%(character)s"),
     "ding": vexec(";"),
     "line <line>": vexec("%(line)sG"),
     "Position <line>": vexec("%(line)s|"),
@@ -1769,14 +1768,15 @@ vim_action_map = {
     "cut rest": vexec("D") + vexec("A"),
     "cut [<n1>] <mvmt>": vexec2("d%(n1)s%(mvmt)s"),
     "cut <ctx>": vexec("d%(ctx)s"),
-    "cut fomble <character>": vexec("df%(char)s"),
-    "cut bamble <character>": vexec("dF%(char)s"),
+    "cut fomble <character>": vexec("df%(character)s"),
+    "cut bamble <character>": vexec("dF%(character)s"),
     "cut line": vexec("dd"),
-    utils.Override("delete"): vexec("x"),
+    #utils.Override("delete"): vexec("x"),
+    "delete": vexec("x"),
     "yank [<n1>] <mvmt>": vexec("y%(n1)s%(mvmt)s"),
     "yank <ctx>": vexec("y%(ctx)s"),
-    "yank fomble <character>": vexec("yf%(char)s"),
-    "yank bamble <character>": vexec("yF%(char)s"),
+    "yank fomble <character>": vexec("yf%(character)s"),
+    "yank bamble <character>": vexec("yF%(character)s"),
     "yank line": vexec("yy"),
     "yank rest": vexec("y$"),
     utils.Override("paste"): vexec("p"),
@@ -1839,7 +1839,7 @@ vim_element_map = {
 
 vim_environment = MyEnvironment(name="Vim",
                                 parent=global_environment,
-                                context=AppContext(title=" - Visual Studio Code"),
+                                context=(AppContext(title=" - Visual Studio Code")|AppContext(executable="WindowsTerminal.exe")),
                                 action_map=vim_action_map,
                                 element_map=vim_element_map)
 
@@ -1872,7 +1872,7 @@ shell_repeatable_action_map = odict[
 shell_action_map = utils.combine_maps(
     shell_command_map,
     odict[
-        utils.Override("cut"): Key("cs-x"),
+        #utils.Override("cut"): Key("cs-x"),
         utils.Override("copy"): Key("cs-c"),
         utils.Override("paste"): Key("cs-v"),
         "tab move [<n>] left": Key("cs-pgup/5:%(n)d"),
