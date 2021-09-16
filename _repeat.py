@@ -1844,6 +1844,86 @@ vim_environment = MyEnvironment(name="Vim",
                                 element_map=vim_element_map)
 
 
+### rust
+rust_action_map = {
+    "let": "let ",
+    "mute": "mut ",
+    "static": "static ",
+    "constant": "const ",
+    "type": "type ",
+    "function": "fn ",
+    "boolean": "bool",
+    "rust for": "for ",
+    "rust false": "false",
+    "rust true": "true",
+    "rust as": "as ",
+    "if": "if ",
+    "else if ": "else if ",
+    "else": "else ",
+    "in": "in ",
+    "dot dot": "..",
+    "extern crate": "extern crate ",
+    "public": "pub ",
+    "trait": "trait ",
+    "where": "where ",
+    "structure": "struct ",
+    "Implement": "impl ",
+    "Enumeration": "enum ",
+    "module": "mod ",
+    "use": "use ",
+    "rust loop": "loop {",
+    "while": "while ",
+    "continue": "continue;",
+    "quinn break": "break;",
+    "Match": "match ",
+    "lifetime <rsletter>": "'%(rsletter)s",
+    "lifetime static": "'static",
+    "ref <rsletter> string": "&'%(rsletter)s str",
+    "self": "self",
+    "self type": "Self",
+    "macro rules": "macro_rules! ",
+    "return": "return ",
+
+    "Ref string": "&str",
+    "print line": "println!(\"",
+    "ref": "&",
+    "deref": "*",
+    "vector": "Vec",
+    "format": "format!(\"",
+    "panic": "panic!(\"",
+    "unimplemented": "unimplemented!(\"",
+    "debug format": "{:?}",
+    "okay": "Ok(",
+    "try": "try!(",
+
+    "rust feature": "#[cfg(feature = \"",
+
+    "I 64": "i64",
+    "I 32": "i32",
+    "I 16": "i16",
+    "I 8": "i8",
+    "i size": "isize",
+    "you 64": "u64",
+    "you 32": "u32",
+    "you 16": "u16",
+    "you 8": "u8",
+    "you size": "usize",
+    "float 32": "f32",
+    "float 64": "f64",
+
+    # "new <format>": "%(format)s::new(",
+    "box new": "Box::new(",
+    "lit vector ": "vec![",
+}
+
+rust_action_map = dict((k, Text(v)) for (k, v) in rust_action_map.items())
+
+rust_environment = MyEnvironment(name="Rust",
+                                parent=vim_environment,
+                                action_map=rust_action_map,
+                                element_map=dict({
+                                    "rsletter": DictListRef(None, DictList("letters_map", letters_map)),
+                                }))
 
 ### Shell
 
