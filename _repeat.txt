@@ -13,8 +13,8 @@ import re
 import _text_utils as text
 
 # Format: some_words
-def format_score(dictation):          # Function name must start with "format_".
-    """ score <dictation> """         # Docstring defining spoken-form.
+def format_snack(dictation):          # Function name must start with "format_".
+    """ snack <dictation> """         # Docstring defining spoken-form.
     return u"_".join(text.split_dictation(dictation))  # Put underscores between words.
 
 # Format: some_words_
@@ -76,7 +76,7 @@ def format_upper_compound(dictation):
 
 # Format: SOME_WORDS
 def format_upper_score(dictation):
-    """ upper score <dictation> """
+    """ shouting snack <dictation> """
     words = [word.upper() for word in text.split_dictation(dictation)]
     return u"_".join(words)
 

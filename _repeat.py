@@ -221,6 +221,7 @@ symbols_map = {
     "hyphen": "-",
     "dash": "-",
     ",": ",",
+    "cam": ",",
     "colon": ":",
     "equals": "=",
     "equals sign": "=",
@@ -280,8 +281,8 @@ symbols_map = {
     "dollar": "$",
     "dollar sign": "$",
     "caret": "^",
-    "arrow": "->",
-    "fat arrow": "=>",
+    "slim": "->",
+    "fat": "=>",
     "colon twice": "::",
     "amper": "&",
     "ampersand": "&",
@@ -553,7 +554,7 @@ command_action_map = utils.combine_maps(
         "go home|[go] west": Key("home"),
         "go end|[go] east": Key("end"),
         "go top|[go] north": Key("c-home"),
-        "go bottom|[go] south": Key("c-end"),
+        #"go bottom|[go] south": Key("c-end"),
         "save": Key("c-s"),
         "(window|win) new": Key("c-n"),
         "(window|win) close": Key("c-w"),
@@ -844,7 +845,6 @@ custom_format_rule = utils.create_rule(
           for (k, v) in format_functions.items()]),
     {"dictation": custom_dictation}
 )
-
 # Rule for printing a sequence of characters.
 character_rule = utils.create_rule(
     "CharacterRule",
@@ -1752,6 +1752,8 @@ vim_action_map = {
     "left [<n1>]": Key("left:%(n1)s"),
     "fomble <character>": vexec("f%(character)s"),
     "bamble <character>": vexec("F%(character)s"),
+    "frothy <character>": vexec("t%(character)s"),
+    "brathy <character>": vexec("T%(character)s"),
     "ding": vexec(";"),
     "line <line>": vexec("%(line)sG"),
     "Position <line>": vexec("%(line)s|"),
@@ -1770,15 +1772,24 @@ vim_action_map = {
     "cut <ctx>": vexec("d%(ctx)s"),
     "cut fomble <character>": vexec("df%(character)s"),
     "cut bamble <character>": vexec("dF%(character)s"),
+    "cut frothy <character>": vexec("dt%(character)s"),
+    "cut brathy <character>": vexec("dT%(character)s"),
     "cut line": vexec("dd"),
+    "trim": vexec("A") + Key("left") + vexec("D") + vexec("A"),
     #utils.Override("delete"): vexec("x"),
     "delete": vexec("x"),
     "yank [<n1>] <mvmt>": vexec("y%(n1)s%(mvmt)s"),
     "yank <ctx>": vexec("y%(ctx)s"),
     "yank fomble <character>": vexec("yf%(character)s"),
     "yank bamble <character>": vexec("yF%(character)s"),
+    "yank frothy <character>": vexec("yt%(character)s"),
+    "yank brathy <character>": vexec("yT%(character)s"),
     "yank line": vexec("yy"),
     "yank rest": vexec("y$"),
+    "exdent [<n1>] <mvmt>": vexec("<%(n1)s%(mvmt)s"),
+    "exdent <ctx>": vexec("<%(ctx)s"),
+    "indent [<n1>] <mvmt>": vexec(">%(n1)s%(mvmt)s"),
+    "indent <ctx>": vexec(">%(ctx)s"),
     utils.Override("paste"): vexec("p"),
     "paste (before|above)": vexec("P"),
     "join lines": vexec("J"),
@@ -1805,6 +1816,8 @@ vim_action_map = {
     "To do": Text("// TODO(clemens): "),
 
     "save buffer": vexec(":w") + Key("enter"),
+    "proc": vexec(":w") + Key("enter"),
+    "sloc": Key("enter") + vexec(":w") + Key("enter"),
     "save all buffers": vexec(":wa") + Key("enter"),
     "previous buffer": Key("c-o, c-caret"),
     "close buffer": vexec(":bd") + Key("enter"),
@@ -1910,6 +1923,7 @@ rust_action_map = {
     "you size": "usize",
     "float 32": "f32",
     "float 64": "f64",
+    "cons": "::",
 
     # "new <format>": "%(format)s::new(",
     "box new": "Box::new(",
@@ -1924,6 +1938,45 @@ rust_environment = MyEnvironment(name="Rust",
                                 element_map=dict({
                                     "rsletter": DictListRef(None, DictList("letters_map", letters_map)),
                                 }))
+
+python_action_map = {
+    "integer": "int",
+    "define": "def ",
+}
+
+python_action_map = dict((k, Text(v)) for (k, v) in python_action_map.items())
+
+python_environment = MyEnvironment(name="Python",
+                                   parent=rust_environment,
+                                   action_map=python_action_map,
+                                  ) 
+
+vscode_action_map = {
+    "open file [<dictation>]": Key("c-p/25") + Text("%(dictation)s"),
+    "open symbol [<dictation>]": Key("a-/25") + Key("c-t/25") + Text("%(dictation)s"),
+    "close file": Key("c-f4"),
+    "previous file": Key("c-tab"),
+    "go back": Key("a-left"),
+    "Go to definition": Key("f12"),
+    "jump": Key("f12"),
+    "compiler down": Key("f8"),
+    "swish": Key("f8"),
+    "compiler up": Key("s-f8"),
+    "rename": Key("f2"),
+    "line numbers": Key("escape/25") + Text(":set rnu") +  Key("enter/25"),
+    "magic": Key("c-."),
+    "shoo": Key("escape:2/25") + Text("i"),
+    "yep": Key("tab") + Key("enter"),
+    "tap": Key("tab"),
+}
+
+vscode_environment = MyEnvironment(name="intellij",
+                                    parent=python_environment,
+                                    action_map=vscode_action_map,
+                                    element_map=dict({
+                                        "dictation": Dictation()
+                                    }))
+
 
 ### Shell
 
@@ -2459,7 +2512,7 @@ class TextRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     #     cProfile.runctx("self.PostInternal()", globals(), locals())
     # def PostInternal(self):
         start_time = time.time()
-        # Check host in case of DNS rebinding attack.
+        # Check host in ease of DNS rebinding attack.
         host = self.headers.getheader("Host")
         host = host.split(":")[0]
         if not (host == "localhost" or host == "localhost." or IsValidIp(host)):
